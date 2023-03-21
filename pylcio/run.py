@@ -17,9 +17,9 @@ from pyLCIO.io.EventLoop import EventLoop
 # from drivers.vtx_hit_props import VtxHitPropsDriver as TheDriver
 # from drivers.trk_efficiency import TrkEfficiencyDriver as TheDriver
 # from drivers.trk_hit_density import HitDensityDriver as TheDriver
-# from drivers.trk_hits_mcp import TrkHitsMCPDriver as TheDriver
+from drivers.trk_hits_mcp import TrkHitsMCPDriver as TheDriver
 # from drivers.trk_hit_loopers import TrkHitLoopersDriver as TheDriver
-from drivers.cal_hits_mcp import CalHitsMCPDriver as TheDriver
+# from drivers.cal_hits_mcp import CalHitsMCPDriver as TheDriver
 
 
 

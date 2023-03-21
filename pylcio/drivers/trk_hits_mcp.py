@@ -8,7 +8,7 @@ from pdb import set_trace as br
 
 CONST_C = R.TMath.C()
 # T_MAX = 0.18 # ns
-T_MAX = 10e3 # ns
+T_MAX = 10.0 # ns
 T_MIN = -1.0 # ns
 
 def get_oldest_mcp_parent(mcp, nIters=0):
@@ -34,6 +34,7 @@ class TrkHitsMCPDriver( Driver ):
         """Constructor"""
         Driver.__init__(self)
         self.output_path = output_path
+        self.output_file = None
 
 
     def startOfData( self ):
@@ -50,6 +51,11 @@ class TrkHitsMCPDriver( Driver ):
                    ]
         names_I = ['layer', 'side', 'col_id',
                    'mcp_pdg', 'mcp_bib_pdg', 'mcp_bib_niters', 'mcp_gen', 'mcp_bib_gen']
+        
+        # Opening the output ROOT file to store the TTree
+        if self.output_path is not None:
+            self.output_file = R.TFile(self.output_path, 'RECREATE')
+
         # Creating the TTree with branches
         self.data = {}
         self.tree = R.TTree('tree', 'SimTrackerHit properties')
@@ -135,7 +141,6 @@ class TrkHitsMCPDriver( Driver ):
         """Called by the event loop at the end of the loop"""
 
         # Storing histograms to the output ROOT file
-        if self.output_path is not None:
-            out_file = R.TFile(self.output_path, 'RECREATE')
-            self.tree.Write()
-            out_file.Close()
+        if self.output_file is not None:
+            self.output_file.Write()
+            self.output_file.Close()
