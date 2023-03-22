@@ -1,12 +1,17 @@
-def get_oldest_mcp_parent(mcp):
+def get_oldest_mcp_parent(mcp, nIters=0):
     """Recursively looks for the oldest parent of the MCParticle"""
     pars = mcp.getParents()
-    if (len(pars) < 1):
-        return mcp
-    for par in pars:
-        if par is mcp:
+    n_pars = len(pars)
+    # Stopping when no more parent particles exist
+    if n_pars < 1:
+        return mcp, nIters
+    # Looping by index to avoid memory leak with the standard `for p in pars` iterator
+    for iP in range(len(pars)):
+        if pars[iP] is mcp:
             continue
-        return get_oldest_mcp_parent(par)
+        # FIXME: This always takes the 1st parent -> could be more in some parton showers
+        return get_oldest_mcp_parent(pars[iP], nIters+1)
+    return mcp, nIters
 
 def pdg_to_type(pdgId):
     """Convert PDG ID of a particle to its type for histograms"""

@@ -5,22 +5,18 @@ from pyLCIO.drivers.Driver import Driver
 from pyLCIO import EVENT, UTIL
 
 from pdb import set_trace as br
+from .utils import get_oldest_mcp_parent
+
+# import psutil
+# import os
 
 CONST_C = R.TMath.C()
 # T_MAX = 0.18 # ns
 T_MAX = 10.0 # ns
 T_MIN = -1.0 # ns
 
-def get_oldest_mcp_parent(mcp, nIters=0):
-    """Recursively looks for the oldest parent of the MCParticle"""
-    pars = mcp.getParents()
-    if (len(pars) < 1):
-        return mcp, nIters
-    for par in pars:
-        # Skipping if the particle is its own parent
-        if par is mcp:
-            continue
-        return get_oldest_mcp_parent(par, nIters+1)
+# PROCESS = psutil.Process(os.getpid())
+
 
 class TrkHitsMCPDriver( Driver ):
     """Driver creating histograms of detector hits and their corresponding MCParticles"""
@@ -74,6 +70,7 @@ class TrkHitsMCPDriver( Driver ):
 
         # Loop over hits
         print('Event: {0:d}'.format(event.getEventNumber()))
+        # print(PROCESS.memory_info().rss)
         for iCol, col_name in enumerate(self.HIT_COLLECTION_NAMES):
             # print('Event: {0:d} Col: {1:s}'.format(event.getEventNumber(), col_name))
             col = event.getCollection(col_name)

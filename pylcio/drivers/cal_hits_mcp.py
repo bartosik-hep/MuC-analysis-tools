@@ -5,27 +5,19 @@ from pyLCIO.drivers.Driver import Driver
 from pyLCIO import EVENT, UTIL
 
 from pdb import set_trace as br
+from .utils import get_oldest_mcp_parent
 
 CONST_C = R.TMath.C()
-T_MAX = 0.3 # ns
-# T_MAX = 10.0 # ns
+# T_MAX = 0.3 # ns
+T_MAX = 10.0 # ns
 T_MIN = -1.0 # ns
 
-def get_oldest_mcp_parent(mcp, nIters=0):
-    """Recursively looks for the oldest parent of the MCParticle"""
-    pars = mcp.getParents()
-    if (len(pars) < 1):
-        return mcp, nIters
-    for par in pars:
-        # Skipping if the particle is its own parent
-        if par is mcp:
-            continue
-        return get_oldest_mcp_parent(par, nIters+1)
 
 class CalHitsMCPDriver( Driver ):
     """Driver creating histograms of detector hits and their corresponding MCParticles"""
 
-    HIT_COLLECTION_NAMES = ['ECalBarrelCollection', 'ECalEndcapCollection']
+    # HIT_COLLECTION_NAMES = ['ECalBarrelCollection', 'ECalEndcapCollection']
+    HIT_COLLECTION_NAMES = ['HCalBarrelCollection', 'HCalEndcapCollection']
     # HIT_COLLECTION_NAMES = ['ECalBarrelCollection', 'ECalEndcapCollection',
     #                         'HCalBarrelCollection', 'HCalEndcapCollection']
 
@@ -33,6 +25,7 @@ class CalHitsMCPDriver( Driver ):
         """Constructor"""
         Driver.__init__(self)
         self.output_path = output_path
+        self.output_file = None
 
 
     def startOfData( self ):
@@ -49,6 +42,11 @@ class CalHitsMCPDriver( Driver ):
                    ]
         names_I = ['layer', 'side', 'col_id',
                    'mcp_pdg', 'mcp_bib_pdg', 'mcp_bib_niters', 'mcp_gen', 'mcp_bib_gen']
+
+        # Opening the output ROOT file to store the TTree
+        if self.output_path is not None:
+            self.output_file = R.TFile(self.output_path, 'RECREATE')
+
         # Creating the TTree with branches
         self.data = {}
         self.tree = R.TTree('tree', 'SimTrackerHit properties')
@@ -136,7 +134,6 @@ class CalHitsMCPDriver( Driver ):
         """Called by the event loop at the end of the loop"""
 
         # Storing histograms to the output ROOT file
-        if self.output_path is not None:
-            out_file = R.TFile(self.output_path, 'RECREATE')
-            self.tree.Write()
-            out_file.Close()
+        if self.output_file is not None:
+            self.output_file.Write()
+            self.output_file.Close()
